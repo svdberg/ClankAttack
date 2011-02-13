@@ -14,7 +14,8 @@
 (defn create-tank
   "Randomly create tank"
   []
-  (Tank. (rand-int *field-width*) (rand-int *field-height*) :foo
+  (Tank. (rand-int *field-width*) (rand-int *field-height*)
+         (if (zero? (rand-int 2)) :friend :foo)
          (rand-int 360)))
 
 (defn create-tanks
@@ -22,13 +23,33 @@
   [n]
   (repeatedly n create-tank))
 
+(defn get-tank-color [tank]
+  (if (= (:id tank) :friend) (Color/green) (Color/blue)))
+
+(defn grad-to-rad [grad]
+  (* (/ grad 180) Math/PI))
+
+(defn render-body [g tank]
+  (let [r *tank-radius*
+        x (:x tank)
+        y (:y tank)]
+    (.fillOval g x y r r)))
+  
+(defn render-barrel [g tank]
+  (let [x1 (:x tank)
+        y1 (:y tank)
+        alfa (grad-to-rad (:angle tank))
+        x2 (+ x1 (* (Math/cos alfa) 20))
+        y2 (+ y1 (* (Math/sin alfa) 20))]
+    (.drawLine g x1 y1 x2 y2)))
+
 (defn render-tank
   "Render a single tank"
   [g tank]
-  (doto g
-    (.setColor (Color/green))
-    (.fillOval (:x tank) (:y tank) *tank-radius* *tank-radius*)))
-
+  (.setColor g (get-tank-color tank))
+  (render-body g tank)
+  (render-barrel g tank))
+  
 (defn render-background [g img]
   (doto g
     (.setColor (Color. 255 230 255))
