@@ -7,7 +7,9 @@
 ; bunch of constants
 (def *field-width* 500)
 (def *field-height* 500)
-(def *tank-radius* 20)
+(def *tank-radius* 10)
+
+; tank stuff should be moved to tank.clj
 
 (defrecord Tank [x y id angle])
 
@@ -31,9 +33,10 @@
 
 (defn render-body [g tank]
   (let [r *tank-radius*
-        x (:x tank)
-        y (:y tank)]
-    (.fillOval g x y r r)))
+        d (* r 2)
+        x (- (:x tank) r)
+        y (- (:y tank) r)]
+    (.fillOval g x y d d)))
   
 (defn render-barrel [g tank]
   (let [x1 (:x tank)
