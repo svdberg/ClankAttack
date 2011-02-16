@@ -12,6 +12,16 @@
          (if (zero? (rand-int 2)) :friend :foo)
          (rand-int 360)))
 
+(defn create-tank-without-loc
+  "create a tank without place, with a direction.
+  dir is a number from 0 to 7"
+  [dir]
+  (let [angle (* dir 45)]
+    (Tank. 0 0
+           (if (zero? (rand-int 2)) :friend :foo)
+           angle)))
+
+
 (defn create-tanks
   "Randomly place n non-overlapping tanks"
   [n fw fh]
