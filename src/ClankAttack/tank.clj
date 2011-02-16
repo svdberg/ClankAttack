@@ -64,3 +64,4 @@
   [g tanks]
   (dorun (map #(render-tank g %) tanks)))
 
+
