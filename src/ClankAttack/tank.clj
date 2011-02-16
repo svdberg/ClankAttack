@@ -3,14 +3,18 @@
 
 (def *tank-radius* 10)
 
-(defrecord Tank [x y id angle])
+(defrecord Tank [x y id angle dir])
 
 (defn create-tank
   "Randomly create tank"
   [fw fh]
-  (Tank. (rand-int fw) (rand-int fh)
-         (if (zero? (rand-int 2)) :friend :foo)
-         (rand-int 360)))
+  (let [ angle (rand-int 360)
+         dir (/ angle 45)]
+    (Tank. (rand-int fw) 
+           (rand-int fh)
+           (if (zero? (rand-int 2)) :friend :foo)
+           angle 
+           dir)))
 
 (defn create-tank-without-loc
   "create a tank without place, with a direction.
@@ -19,8 +23,8 @@
   (let [angle (* dir 45)]
     (Tank. 0 0
            (if (zero? (rand-int 2)) :friend :foo)
-           angle)))
-
+           angle
+           dir)))
 
 (defn create-tanks
   "Randomly place n non-overlapping tanks"
