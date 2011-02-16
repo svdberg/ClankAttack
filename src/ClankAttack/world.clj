@@ -8,8 +8,8 @@
 ;The tank has state: its position (and angle)
 
 ;dimensions of square world
-(def dim 80)
-(def max-nr-of-tanks 10)
+(def dim 10)
+(def max-nr-of-tanks 2)
 
 ;(defrecord Cell [tank])
 (defstruct cell :tank) ;may also have :tank and :bullet
@@ -32,7 +32,7 @@
   [loc dir]
     (sync nil
       (let [p (place loc)
-            t (t/create-tank-without-loc dir)]
+            t (create-tank-without-loc dir)]
         (alter p assoc :tank t)
         (agent loc))))
 
