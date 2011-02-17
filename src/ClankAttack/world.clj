@@ -8,8 +8,8 @@
 ;The tank has state: its position (and angle)
 
 ;dimensions of square world
-(def dim 10)
-(def max-nr-of-tanks 2)
+(def dim 50)
+(def max-nr-of-tanks 4)
 
 ;(defrecord Cell [tank])
 (defstruct cell :tank) ;may also have :tank and :bullet
