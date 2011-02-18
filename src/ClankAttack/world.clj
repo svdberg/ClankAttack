@@ -9,10 +9,10 @@
 
 ;dimensions of square world
 (def dim 50)
-(def max-nr-of-tanks 4)
+(def max-nr-of-tanks 1)
 
 ;(defrecord Cell [tank])
-(defstruct cell :tank) ;may also have :tank and :bullet
+(defstruct cell :tank) ;may also have :tank and :bullet or :wall
 
 ;world is a 2d vector of refs to cells
 (def world 
@@ -26,6 +26,19 @@
   "helper function to look up a cell in the world"
   (-> world (nth x) (nth y)))
 
+(defn create-walls
+  []
+  (let [ r (apply vector (map #(vector 0 %) (range dim)))]
+    (map #(dosync (alter (place %) assoc :wall 1)) r)))
+
+(defn print-row
+  [r]
+  (map #(if (= 1 (:wall (deref %))) "-" " ") r))
+
+(defn print-world
+  [world]
+  (map #(print-row %) world))
+
 ;name conflict with the tank creation function itself?
 (defn create-tank-in-world
   "create an tank at the location, returning a tank agent on the location"
@@ -36,7 +49,7 @@
         (alter p assoc :tank t)
         (agent loc))))
 
-;creates 100 tanks in a 80x80 grid now
+;creates tanks in a 80x80 grid now
 (defn setup 
   "places initial tanks, returns seq of tank agents"
   []
@@ -70,6 +83,13 @@
 [[x y] dir]
   (let [[dx dy] (dir-delta (bound 8 dir))]
     [(bound dim (+ x dx)) (bound dim (+ y dy))]))
+
+(defn change-dir
+  "changes the direction of the tank on impact with a wall.
+  angle of impact equals angle of outgoing"
+  [loc tank]
+  (let [newdir (rand-int 8)]
+    (alter tank assoc :dir newdir)))
 
 (defn move 
   "moves the tank in the direction it is heading. Must be called in a

@@ -28,11 +28,23 @@
   (let [t (assoc tank :x (* x scale) :y (* y scale))]
     (render-tank g t)))
 
+(defn render-wall [#^Graphics g x y]
+  (let [ x1 (* x scale)
+         y1 (* y scale)
+         w scale
+         h scale]
+  (doto g
+    (.setColor (. Color red))
+    (.drawRect x1 y1 w h))))
+
 (defn render-place [g p x y]
   "get a cell from the world and check if it has a tank.
   If it has: render it"
-  (when (and (:tank p) (not= (:tank p) 0))
-    (render-a-tank (:tank p) g x y)))
+  (cond 
+    (and (:tank p) (not= (:tank p) 0))
+      (render-a-tank (:tank p) g x y)
+    (= (:wall p) 1)
+      (render-wall g x y)))
 
 
 (defn render [g]
@@ -81,5 +93,7 @@
       (cond
         (= (:tank @ahead) 0)
           (move loc)
+        (= (:wall @ahead))
+          (change-dir ahead tank)
         :else
           loc))))
