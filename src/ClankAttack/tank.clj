@@ -1,7 +1,8 @@
 (ns ClankAttack.tank
   (:import (java.awt Color Graphics Dimension)))
 
-(def *tank-radius* 10)
+;should be scale
+(def *tank-radius* (/ 5 2))
 
 (defrecord Tank [x y id angle dir])
 
@@ -48,8 +49,8 @@
   (let [x1 (:x tank)
         y1 (:y tank)
         alfa (grad-to-rad (:angle tank))
-        x2 (+ x1 (* (Math/cos alfa) 20))
-        y2 (+ y1 (* (Math/sin alfa) 20))]
+        x2 (+ x1 (* (Math/cos alfa) 5))
+        y2 (+ y1 (* (Math/sin alfa) 5))]
     (.drawLine g x1 y1 x2 y2)))
 
 (defn render-tank

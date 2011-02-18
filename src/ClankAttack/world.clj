@@ -9,7 +9,7 @@
 
 ;dimensions of square world
 (def dim 50)
-(def max-nr-of-tanks 1)
+(def max-nr-of-tanks 2)
 
 ;(defrecord Cell [tank])
 (defstruct cell :tank) ;may also have :tank and :bullet or :wall
@@ -27,8 +27,8 @@
   (-> world (nth x) (nth y)))
 
 (defn create-walls
-  []
-  (let [ r (apply vector (map #(vector 0 %) (range dim)))]
+  [row]
+  (let [ r (apply vector (map #(vector row %) (range dim)))]
     (map #(dosync (alter (place %) assoc :wall 1)) r)))
 
 (defn print-row
@@ -84,12 +84,14 @@
   (let [[dx dy] (dir-delta (bound 8 dir))]
     [(bound dim (+ x dx)) (bound dim (+ y dy))]))
 
-(defn change-dir
-  "changes the direction of the tank on impact with a wall.
-  angle of impact equals angle of outgoing"
-  [loc tank]
-  (let [newdir (rand-int 8)]
-    (alter tank assoc :dir newdir)))
+(defn turn 
+  "turns the tank at the location by the given amount"
+  [loc amt]
+    (dosync
+     (let [p (place loc)
+           tank (:tank @p)]
+       (alter p assoc :tank (assoc tank :dir (bound 8 (+ (:dir tank) amt))))))
+    loc)
 
 (defn move 
   "moves the tank in the direction it is heading. Must be called in a

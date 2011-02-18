@@ -80,6 +80,19 @@
   (. Thread (sleep animation-sleep-ms))
   nil)
 
+(defn check-wall
+  [loc]
+  (let [ p (place loc)
+        tank (:tank @p)
+        ahead (place (delta-loc loc (:dir tank)))]
+    (. Thread (sleep tank-sleep-ms))
+    (dosync
+      (when running
+        (send-off *agent* #'check-wall))
+      (when (= (:wall @ahead) 1)
+        (print "wall!")))))
+        
+
 (defn behave
   "the basic behaviour of a tank"
   [loc]
@@ -93,7 +106,7 @@
       (cond
         (= (:tank @ahead) 0)
           (move loc)
-        (= (:wall @ahead))
-          (change-dir ahead tank)
+        (= (:wall @ahead) 1)
+          (move (turn loc -1))
         :else
           loc))))
