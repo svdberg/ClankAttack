@@ -104,9 +104,9 @@
       (when running
         (send-off *agent* #'behave))
       (cond
+        (= (:wall @ahead) 1)
+         (-> loc (turn 4))
         (= (:tank @ahead) 0)
           (move loc)
-        (= (:wall @ahead) 1)
-          (move (turn loc -1))
         :else
           loc))))
