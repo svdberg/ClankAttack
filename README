@@ -4,7 +4,19 @@ simple tank game
 
 ## Usage
 
-FIXME: write
+To create tanks:
+open the repl
+
+(ns ClankAttack.core)
+;create tanks:
+(def tanks (setup))
+;create the animation agent
+(send-off animator animation)
+;let the tanks behave
+(dorun (map #(send-off % behave) tanks))
+
+You can optionally create some walls in the playing field by using the functions
+create-horizontal-wall and create-vertical-wall in the namespace world.
 
 ## Installation
 
