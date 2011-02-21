@@ -40,14 +40,6 @@
          r (apply vector (map (fn [x y] (vector x y)) (take l (repeatedly (fn [] start-x))) (range start-y end-y) ))] 
     (map #(dosync (alter (place %) assoc :wall 1)) r)))
 
-(defn print-row
-  [r]
-  (map #(if (= 1 (:wall (deref %))) "-" " ") r))
-
-(defn print-world
-  [world]
-  (map #(print-row %) world))
-
 ;name conflict with the tank creation function itself?
 (defn create-tank-in-world
   "create an tank at the location, returning a tank agent on the location"
@@ -71,14 +63,14 @@
 
 ;dirs are 0-7, starting at north and going clockwise
 ;these are the deltas in order to move one step in given dir
-(def dir-delta {0 [0 -1]
-                1 [1 -1]
+(def dir-delta {0 [0 1]
+                1 [1 1]
                 2 [1 0]
-                3 [1 1]
-                4 [0 1]
-                5 [-1 1]
+                3 [1 -1]
+                4 [0 -1]
+                5 [-1 -1]
                 6 [-1 0]
-                7 [-1 -1]})
+                7 [-1 1]})
 (defn bound 
   "returns n wrapped into range 0-b"
   [b n]
@@ -98,8 +90,10 @@
   [loc amt]
     (dosync
      (let [p (place loc)
-           tank (:tank @p)]
-       (alter p assoc :tank (assoc tank :dir (bound 8 (+ (:dir tank) amt))))))
+           tank (:tank @p)
+           new-dir (bound 8 (+ (:dir tank) amt))
+           new-angle (* new-dir 45)]
+       (alter p assoc :tank (assoc tank :angle new-angle :dir new-dir))))
     loc)
 
 (defn move 
