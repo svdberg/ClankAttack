@@ -5,6 +5,12 @@
 (def *tank-radius* (/ 5 2))
 
 (defrecord Tank [x y id angle dir])
+(defrecord Bullet [x y dir])
+
+(defn create-bullet
+  [dir]
+  (Bullet. 0 0
+           dir))
 
 (defn create-tank
   "Randomly create tank"

@@ -37,6 +37,12 @@
     (.setColor (. Color red))
     (.drawRect x1 y1 w h))))
 
+(defn render-bullet [bullet #^Graphics g x y]
+  (let [ r 2
+         x1 (+ x (/ scale 2))
+         y1 (+ y (/ scale 2))]
+    (.fillOval g x1 y1 r r)))
+
 (defn render-place [g p x y]
   "get a cell from the world and check if it has a tank.
   If it has: render it"
@@ -44,7 +50,9 @@
     (and (:tank p) (not= (:tank p) 0))
       (render-a-tank (:tank p) g x y)
     (= (:wall p) 1)
-      (render-wall g x y)))
+      (render-wall g x y)
+    (and (:bullet p) (not= (:bullet p) 0))
+      (render-bullet (:bullet p) g x y)))
 
 
 (defn render [g]
@@ -80,18 +88,22 @@
   (. Thread (sleep animation-sleep-ms))
   nil)
 
-(defn check-wall
+;this should hold all bullet agents in the future..
+(def bullet-list
+  (ref ( map #( agent [-1 -1]) (range 0 4))))
+
+;(defn add-bullet
+;  [bullet]
+;  (dosync
+;    (conj bullet-list bullet)))
+
+(defn bullet-behave
   [loc]
-  (let [ p (place loc)
-        tank (:tank @p)
-        ahead (place (delta-loc loc (:dir tank)))]
-    (. Thread (sleep tank-sleep-ms))
-    (dosync
+  (. Thread (sleep tank-sleep-ms))
+  (dosync
       (when running
-        (send-off *agent* #'check-wall))
-      (when (= (:wall @ahead) 1)
-        (print "wall!")))))
-        
+        (send-off *agent* #'bullet-behave))
+      (move-bullet loc)))
 
 (defn behave
   "the basic behaviour of a tank"
@@ -107,6 +119,11 @@
         (= (:wall @ahead) 1)
          (-> loc (turn 4))
         (= (:tank @ahead) 0)
+          ;fire a bullet
+          ;(send (create-bullet-in-world loc (:dir tank)) bullet-behave) 
           (move loc)
+          ;(add-bullet (create-bullet-in-world loc (:dir tank)))
         :else
           loc))))
+
+

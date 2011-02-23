@@ -50,6 +50,15 @@
         (alter p assoc :tank t)
         (agent loc))))
 
+(defn create-bullet-in-world
+  "create a bullet at a specific location"
+  [loc dir]
+  (sync nil
+        (let [p (place loc)
+              t (create-bullet dir)]
+          (alter p assoc :bullet t)
+          (agent loc))))
+
 ;creates tanks in a 80x80 grid now
 (defn setup 
   "places initial tanks, returns seq of tank agents"
@@ -107,4 +116,15 @@
          ;move the tank
        (alter p assoc :tank tank)
        (alter oldp assoc :tank 0)
-       newloc))
+  newloc))
+
+(defn move-bullet
+  "moves the bullet at twice the speed of the tank"
+  [loc]
+  (let [oldp (place loc)
+        bullet (:bullet @oldp)
+        newloc (delta-loc (delta-loc loc (:dir bullet)) (:dir bullet))
+        p (place newloc)]
+    (alter p assoc :bullet bullet)
+    (alter oldp dissoc :bullet)
+  newloc))
