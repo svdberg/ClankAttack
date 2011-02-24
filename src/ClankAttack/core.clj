@@ -38,9 +38,9 @@
     (.drawRect x1 y1 w h))))
 
 (defn render-bullet [bullet #^Graphics g x y]
-  (let [ r 2
-         x1 (+ x (/ scale 2))
-         y1 (+ y (/ scale 2))]
+  (let [ r 3
+         x1 (* x scale)
+         y1 (* y scale)]
     (.fillOval g x1 y1 r r)))
 
 (defn render-place [g p x y]
@@ -88,16 +88,8 @@
   (. Thread (sleep animation-sleep-ms))
   nil)
 
-;this should hold all bullet agents in the future..
-(def bullet-list
-  (ref ( map #( agent [-1 -1]) (range 0 4))))
-
-;(defn add-bullet
-;  [bullet]
-;  (dosync
-;    (conj bullet-list bullet)))
-
 (defn bullet-behave
+  "bullet behaviour agent, flies a bullet"
   [loc]
   (. Thread (sleep tank-sleep-ms))
   (dosync
@@ -110,19 +102,19 @@
   [loc]
   (let [ p (place loc)
          tank (:tank @p)
-         ahead (place (delta-loc loc (:dir tank)))]
+         ahead (place (delta-loc loc (:dir tank)))
+         rnd-int (rand-int 10)]
     (. Thread (sleep tank-sleep-ms))
     (dosync
       (when running
         (send-off *agent* #'behave))
+      (when (> rnd-int 5)
+        (send-off (create-bullet-in-world loc (:dir tank)) bullet-behave))
       (cond
         (= (:wall @ahead) 1)
          (-> loc (turn 4))
         (= (:tank @ahead) 0)
-          ;fire a bullet
-          ;(send (create-bullet-in-world loc (:dir tank)) bullet-behave) 
           (move loc)
-          ;(add-bullet (create-bullet-in-world loc (:dir tank)))
         :else
           loc))))
 
