@@ -138,7 +138,7 @@
       (when running
         (send-off *agent* #'behave))
       (when (> rnd-int 8)
-        (send-off (create-bullet-in-world ahead (:dir tank)) bullet-behave))
+        (send-off (create-bullet-in-world loc (:dir tank)) bullet-behave)) ; is this correct, maybe loc?
       (cond
         (= (:wall @ahead) 1)
          (-> loc (turn 4))
