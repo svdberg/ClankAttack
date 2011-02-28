@@ -25,8 +25,9 @@
 
 ;new world drawing
 (defn render-a-tank [tank #^Graphics g x y]
-  (let [t (assoc tank :x (* x scale) :y (* y scale))]
-    (render-tank g t)))
+  (let [t (assoc tank :x (* x scale) :y (* y scale))
+        hit (:shot tank)]
+    (if hit nil (render-tank g t))))
 
 (defn render-wall [#^Graphics g x y]
   (let [ x1 (* x scale)
@@ -40,8 +41,9 @@
 (defn render-bullet [bullet #^Graphics g x y]
   (let [ r 3
          x1 (* x scale)
-         y1 (* y scale)]
-    (.fillOval g x1 y1 r r)))
+         y1 (* y scale)
+         hit (:hit bullet)]
+    (if hit nil (.fillOval g x1 y1 r r))))
 
 (defn render-place [g p x y]
   "get a cell from the world and check if it has a tank.
@@ -88,14 +90,40 @@
   (. Thread (sleep animation-sleep-ms))
   nil)
 
-(defn bullet-behave
-  "bullet behaviour agent, flies a bullet"
+
+(defn shoot-tank
+  "updates the state of a tank to shot"
   [loc]
+  (let [p (place loc)
+        tank (:tank @p)
+        bullet (:bullet @p)
+        changed-tank (assoc tank :shot true)
+        changed-bullet (assoc bullet :hit true)]
+      (alter p assoc :tank changed-tank)
+      (alter p assoc :bullet changed-bullet)
+      loc))
+
+
+(defn bullet-behave
+  "bullet behaviour agent, flies a bullet
+   three options:
+   1. there is a tank ahead => tank gets shot, bullet hits
+   2. there is a tank ahead ahead => tank gets shot, bullet hits
+   3. there is no tank ahead, move forward"
+  [loc]
+  (let [p (place loc)
+        bullet (:bullet @p)
+        ahead (place (delta-loc loc (:dir bullet)))]
   (. Thread (sleep tank-sleep-ms))
   (dosync
       (when running
         (send-off *agent* #'bullet-behave))
-      (move-bullet loc)))
+      (if
+        (not= (:tank @p) 0)
+          ;there is a tank ahead, it gets shot
+          (shoot-tank loc) 
+        ;else
+          (move-bullet loc)))))
 
 (defn behave
   "the basic behaviour of a tank"
@@ -106,10 +134,11 @@
          rnd-int (rand-int 10)]
     (. Thread (sleep tank-sleep-ms))
     (dosync
+      ;don't send of the new agent when we are about to be hit..
       (when running
         (send-off *agent* #'behave))
-      (when (> rnd-int 5)
-        (send-off (create-bullet-in-world loc (:dir tank)) bullet-behave))
+      (when (> rnd-int 8)
+        (send-off (create-bullet-in-world ahead (:dir tank)) bullet-behave))
       (cond
         (= (:wall @ahead) 1)
          (-> loc (turn 4))

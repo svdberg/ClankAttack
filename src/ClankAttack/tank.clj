@@ -4,34 +4,38 @@
 ;should be scale
 (def *tank-radius* (/ 5 2))
 
-(defrecord Tank [x y id angle dir])
-(defrecord Bullet [x y dir])
+(defrecord Tank [x y id angle dir shot]) ;x and y should be factored out
+(defrecord Bullet [dir hit])
 
 (defn create-bullet
   [dir]
-  (Bullet. 0 0
-           dir))
+  (Bullet. 
+    dir false))
 
 (defn create-tank
   "Randomly create tank"
   [fw fh]
   (let [ angle (rand-int 360)
-         dir (/ angle 45)]
+         dir (/ angle 45)
+         shot false]
     (Tank. (rand-int fw) 
            (rand-int fh)
            (if (zero? (rand-int 2)) :friend :foo)
            angle 
-           dir)))
+           dir
+           false)))
 
 (defn create-tank-without-loc
   "create a tank without place, with a direction.
   dir is a number from 0 to 7"
   [dir]
-  (let [angle (* dir 45)]
+  (let [angle (* dir 45)
+        shot false]
     (Tank. 0 0
            (if (zero? (rand-int 2)) :friend :foo)
            angle
-           dir)))
+           dir
+           false)))
 
 (defn create-tanks
   "Randomly place n non-overlapping tanks"
