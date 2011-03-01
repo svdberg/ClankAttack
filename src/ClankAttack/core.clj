@@ -16,7 +16,8 @@
   
 (def running true)
 (def animation-sleep-ms 100)
-(def tank-sleep-ms 40)
+(def tank-sleep-ms 80)
+(def bullet-sleep-ms 40)
 
 (defn render-background [g img]
   (doto g
@@ -113,10 +114,11 @@
   [loc]
   (let [p (place loc)
         bullet (:bullet @p)
+        hit? (:hit bullet)
         ahead (place (delta-loc loc (:dir bullet)))]
-  (. Thread (sleep tank-sleep-ms))
+  (. Thread (sleep bullet-sleep-ms))
   (dosync
-      (when running
+      (when (and running (not hit?))
         (send-off *agent* #'bullet-behave))
       (if
         (not= (:tank @p) 0)
@@ -130,15 +132,17 @@
   [loc]
   (let [ p (place loc)
          tank (:tank @p)
-         ahead (place (delta-loc loc (:dir tank)))
+         hit? (:shot tank)
+         new-loc (delta-loc (delta-loc loc (:dir tank)) (:dir tank))
+         ahead (place new-loc)
          rnd-int (rand-int 10)]
     (. Thread (sleep tank-sleep-ms))
     (dosync
       ;don't send of the new agent when we are about to be hit..
-      (when running
+      (when (and running (not hit?))
         (send-off *agent* #'behave))
-      (when (> rnd-int 8)
-        (send-off (create-bullet-in-world loc (:dir tank)) bullet-behave)) ; is this correct, maybe loc?
+      (when (and (> rnd-int 8) (not hit?))
+        (send-off (create-bullet-in-world new-loc (:dir tank)) bullet-behave)) ; is this correct, maybe loc?
       (cond
         (= (:wall @ahead) 1)
          (-> loc (turn 4))

@@ -123,7 +123,8 @@
   [loc]
   (let [oldp (place loc)
         bullet (:bullet @oldp)
-        newloc (delta-loc (delta-loc loc (:dir bullet)) (:dir bullet))
+        ;newloc (delta-loc (delta-loc loc (:dir bullet)) (:dir bullet))
+        newloc (delta-loc loc (:dir bullet)) 
         p (place newloc)]
     (alter p assoc :bullet bullet)
     (alter oldp dissoc :bullet)
