@@ -6,7 +6,7 @@
   (:import (java.awt.image BufferedImage)))
 
 ; bunch of constants
-;
+
 ;pixels per world cell
 (def scale 5)
 
@@ -14,21 +14,19 @@
 (def *field-width* (* dim scale))
 (def *field-height* (* dim scale))
   
-(def running true)
 (def animation-sleep-ms 100)
-(def tank-sleep-ms 80)
-(def bullet-sleep-ms 40)
 
 (defn render-background [g img]
   (doto g
     (.setColor (Color. 255 230 255))
     (.fillRect 0 0 (.getWidth img) (.getHeight img))))
 
-;new world drawing
+;world drawing
 (defn render-a-tank [tank #^Graphics g x y]
-  (let [t (assoc tank :x (* x scale) :y (* y scale))
+  (let [x1 (* x scale)
+        y1 (* y scale)
         hit (:shot tank)]
-    (if hit nil (render-tank g t))))
+    (if hit nil (render-tank g x1 y1 tank))))
 
 (defn render-wall [#^Graphics g x y]
   (let [ x1 (* x scale)
@@ -90,65 +88,3 @@
   (. panel (repaint))
   (. Thread (sleep animation-sleep-ms))
   nil)
-
-
-(defn shoot-tank
-  "updates the state of a tank to shot"
-  [loc]
-  (let [p (place loc)
-        tank (:tank @p)
-        bullet (:bullet @p)
-        changed-tank (assoc tank :shot true)
-        changed-bullet (assoc bullet :hit true)]
-      (alter p assoc :tank changed-tank)
-      (alter p assoc :bullet changed-bullet)
-      loc))
-
-
-(defn bullet-behave
-  "bullet behaviour agent, flies a bullet
-   three options:
-   1. there is a tank ahead => tank gets shot, bullet hits
-   2. there is a tank ahead ahead => tank gets shot, bullet hits
-   3. there is no tank ahead, move forward"
-  [loc]
-  (let [p (place loc)
-        bullet (:bullet @p)
-        hit? (:hit bullet)
-        ahead (place (delta-loc loc (:dir bullet)))]
-  (. Thread (sleep bullet-sleep-ms))
-  (dosync
-      (when (and running (not hit?))
-        (send-off *agent* #'bullet-behave))
-      (if
-        (not= (:tank @p) 0)
-          ;there is a tank ahead, it gets shot
-          (shoot-tank loc) 
-        ;else
-          (move-bullet loc)))))
-
-(defn behave
-  "the basic behaviour of a tank"
-  [loc]
-  (let [ p (place loc)
-         tank (:tank @p)
-         hit? (:shot tank)
-         new-loc (delta-loc (delta-loc loc (:dir tank)) (:dir tank))
-         ahead (place new-loc)
-         rnd-int (rand-int 10)]
-    (. Thread (sleep tank-sleep-ms))
-    (dosync
-      ;don't send of the new agent when we are about to be hit..
-      (when (and running (not hit?))
-        (send-off *agent* #'behave))
-      (when (and (> rnd-int 8) (not hit?))
-        (send-off (create-bullet-in-world new-loc (:dir tank)) bullet-behave)) ; is this correct, maybe loc?
-      (cond
-        (= (:wall @ahead) 1)
-         (-> loc (turn 4))
-        (= (:tank @ahead) 0)
-          (move loc)
-        :else
-          loc))))
-
-
