@@ -3,10 +3,10 @@
   (:import (java.awt Color Graphics Dimension)))
 
 ;should be scale
-(def *tank-radius* (/ 5 2))
+(def *tank-radius* (/ 10 2))
 
 ;timing constants
-(def tank-sleep-ms 80)
+(def tank-sleep-ms 99)
 (def bullet-sleep-ms 40)
 
 (defrecord Tank [id angle dir shot])
@@ -64,8 +64,8 @@
   (let [x1 x 
         y1 y 
         alfa (grad-to-rad (:angle tank))
-        x2 (+ x1 (* (Math/sin alfa) 5)) ;what about numeric errors?
-        y2 (+ y1 (* (Math/cos alfa) 5))]
+        x2 (+ x1 (* (Math/sin alfa) 10)) ;what about numeric errors?
+        y2 (+ y1 (* (Math/cos alfa) 10))]
     (.drawLine g x1 y1 x2 y2)))
 
 (defn render-tank
@@ -192,6 +192,7 @@
          hit? (:shot tank)
          new-loc (delta-loc (delta-loc loc (:dir tank)) (:dir tank))
          ahead (place new-loc)
+         rand-turn (rand-int 8)
          rnd-int (rand-int 10)]
     (. Thread (sleep tank-sleep-ms))
     (dosync
@@ -202,6 +203,9 @@
       (cond
         (= (:wall @ahead) 1)
           (-> loc (turn 4))
+        (= rnd-int 7)
+          ;lucky number! Turn!
+          (-> loc (turn rand-turn))
         (= (:tank @ahead) 0)
           (move loc)
         :else

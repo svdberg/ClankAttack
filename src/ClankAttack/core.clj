@@ -8,7 +8,7 @@
 ; bunch of constants
 
 ;pixels per world cell
-(def scale 5)
+(def scale 10)
 
 ; equals a grid world
 (def *field-width* (* dim scale))
@@ -38,7 +38,7 @@
     (.drawRect x1 y1 w h))))
 
 (defn render-bullet [bullet #^Graphics g x y]
-  (let [ r 3
+  (let [ r 6
          x1 (* x scale)
          y1 (* y scale)
          hit (:hit bullet)]
