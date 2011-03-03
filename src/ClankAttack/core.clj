@@ -88,3 +88,26 @@
   (. panel (repaint))
   (. Thread (sleep animation-sleep-ms))
   nil)
+
+(def wall-seq [(create-horizontal-wall 0 49 0)
+        (create-horizontal-wall 0 49 49)
+        (create-vertical-wall 1 49 0)
+        (create-vertical-wall 1 49 49)
+        (create-vertical-wall 10 40 15)
+        (create-vertical-wall 10 40 40)])
+
+(defn setup-walls
+  []
+  (doall wall-seq))
+
+(defn demo
+  []
+  "Runs a demo
+  setup tanks
+  setup walls
+  run agents"
+  (let [walls (doall wall-seq)
+        tanks (setup)
+        ranimation (send-off animator animation)]
+    (dorun (map #(send-off % behave) tanks))))
+

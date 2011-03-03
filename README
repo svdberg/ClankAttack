@@ -3,6 +3,14 @@
 simple tank game
 
 ## Usage
+Simpelest usage:
+open REPL
+(load-file "src/ClankAttack/core.clj")
+(ns ClankAttack.core)
+(setup-walls)
+(demo)
+
+Or if u want to play around some more:
 
 To create tanks:
 open the repl

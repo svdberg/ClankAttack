@@ -135,6 +135,7 @@
     (alter p assoc :bullet bullet)
     (alter oldp dissoc :bullet)
   newloc))
+
 (defn shoot-tank
   "updates the state of a tank to shot"
   [loc]
@@ -205,5 +206,4 @@
           (move loc)
         :else
           loc))))
-
 
