@@ -5,8 +5,6 @@
   (:import (java.awt Color Graphics Dimension))
   (:import (java.awt.image BufferedImage)))
 
-; bunch of constants
-
 ;pixels per world cell
 (def scale 10)
 
@@ -29,13 +27,13 @@
       (render-tank g x1 y1 tank))))
 
 (defn render-wall [#^Graphics g x y]
-  (let [ x1 (* x scale)
-         y1 (* y scale)
-         w scale
-         h scale]
-  (doto g
-    (.setColor (. Color red))
-    (.drawRect x1 y1 w h))))
+  (let [x1 (* x scale)
+        y1 (* y scale)
+        w scale
+        h scale]
+    (doto g
+      (.setColor Color/red)
+      (.drawRect x1 y1 w h))))
 
 (defn render-bullet [bullet #^Graphics g x y]
   (let [r 6
@@ -62,10 +60,10 @@
                                    @(place [x y]))))
         img (new BufferedImage (* scale dim) (* scale dim) 
                  (. BufferedImage TYPE_INT_ARGB))
-        bg (. img (getGraphics))]
+        bg (.getGraphics img)]
     (doto bg
-      (.setColor (. Color white))
-      (.fillRect 0 0 (. img (getWidth)) (. img (getHeight))))
+      (.setColor Color/white)
+      (.fillRect 0 0 (.getWidth img) (.getHeight img)))
     (dorun 
      (for [x (range dim) y (range dim)]
        (render-place bg (v (+ (* x dim) y)) x y)))
@@ -85,8 +83,8 @@
   "the animation agent"
   (when running
     (send-off *agent* #'animation))
-  (. panel (repaint))
-  (. Thread (sleep animation-sleep-ms))
+  (.repaint panel)
+  (Thread/sleep animation-sleep-ms)
   nil)
 
 (def wall-seq [(create-horizontal-wall 0 49 0)
