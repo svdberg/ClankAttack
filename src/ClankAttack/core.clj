@@ -24,9 +24,9 @@
 ;world drawing
 (defn render-a-tank [tank #^Graphics g x y]
   (let [x1 (* x scale)
-        y1 (* y scale)
-        hit (:shot tank)]
-    (if hit nil (render-tank g x1 y1 tank))))
+        y1 (* y scale)]
+    (when-not (:shot tank)
+      (render-tank g x1 y1 tank))))
 
 (defn render-wall [#^Graphics g x y]
   (let [ x1 (* x scale)
@@ -38,11 +38,11 @@
     (.drawRect x1 y1 w h))))
 
 (defn render-bullet [bullet #^Graphics g x y]
-  (let [ r 6
-         x1 (* x scale)
-         y1 (* y scale)
-         hit (:hit bullet)]
-    (if hit nil (.fillOval g x1 y1 r r))))
+  (let [r 6
+        x1 (* x scale)
+        y1 (* y scale)]
+    (when-not (:hit bullet)
+      (.fillOval g x1 y1 r r))))
 
 (defn render-place [g p x y]
   "get a cell from the world and check if it has a tank.
