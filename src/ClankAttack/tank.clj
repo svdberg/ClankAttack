@@ -21,13 +21,11 @@
   "create a tank without place, with a direction.
   dir is a number from 0 to 7"
   [dir]
-  (let [angle (* dir 45)
-        shot false]
-    (Tank. 
-           (if (zero? (rand-int 2)) :friend :foo)
-           angle
-           dir
-           false)))
+  (Tank. 
+   (if (zero? (rand-int 2)) :friend :foo)
+   (* dir 45)
+   dir
+   false))
 
 (defn create-tank-in-world
   "create an tank at the location, returning a tank agent on the location"

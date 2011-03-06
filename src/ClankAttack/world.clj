@@ -10,7 +10,7 @@
 
 ;dimensions of square world
 (def dim 50)
-(def max-nr-of-tanks 2)
+(def max-nr-of-tanks 4)
 
 ;flag to set the world running
 (def running true)
@@ -43,15 +43,23 @@
          r (apply vector (map (fn [x y] (vector x y)) (take l (repeatedly (fn [] start-x))) (range start-y end-y) ))] 
     (map #(dosync (alter (place %) assoc :wall 1)) r)))
 
+(defn create-random-coordinate
+  "create a random coordinate"
+  []
+  [(rand-int dim) (rand-int dim)])
+
+(defn create-random-coordinates
+  "create n unique random coordinates"
+  [n]
+  (take n (distinct (repeatedly create-random-coordinate))))
+
 ;creates tanks in a 80x80 grid now
-(defn setup 
+(defn setup
   "places initial tanks, returns seq of tank agents"
   []
   (sync nil
-    (doall
-     (for [x (repeatedly max-nr-of-tanks #(rand-int dim))
-           y (repeatedly max-nr-of-tanks #(rand-int dim))]
-       (do
-         (create-tank-in-world [x y] (rand-int 8)))))))
+        (doall
+         (map #(create-tank-in-world % (rand-int 8))
+              (create-random-coordinates max-nr-of-tanks)))))
 
 
