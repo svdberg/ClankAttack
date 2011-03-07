@@ -29,27 +29,19 @@
   "helper function to look up a cell in the world"
   (-> world (nth x) (nth y)))
 
-(defn place-wall-element [c]
-  (dosync (alter (place c) assoc :wall 1)))
-
-(defn create-wall
-  "create wall from seq of coordinates"
-  [coords]
-  (map place-wall-element coords))
+(defn place-brick [x y]
+  "All in all your just another brick in the wall..."
+  (dosync (alter (place [x y]) assoc :wall 1)))
 
 (defn create-horizontal-wall
-  "create a wall in the playing field. From cell (start-x start-y) to cell (end-x end-y)"
-  [start-x end-x start-y]
-  (let [l (- end-x start-x)
-        r (map (fn [x y] [x y]) (range start-x end-x) (repeat l start-y))]
-    (create-wall r)))
+  "create a wall in the playing field. From cell (x0 y) to cell (x1 y)"
+  [x0 x1 y]
+  (map place-brick (range x0 x1) (repeat (- x1 x0) y)))
 
 (defn create-vertical-wall
-  "create a wall in the playing field. From cell (start-x start-y) to cell (end-x end-y)"
-  [start-y end-y start-x]
-  (let [l (- end-y start-y)
-        r (map (fn [x y] [x y]) (repeat l start-x) (range start-y end-y))]
-    (create-wall r)))
+  "create a wall in the playing field. From cell (x y0) to cell (x y1)"
+  [y0 y1 x]
+  (map place-brick (repeat (- y1 y0) x) (range y0 y1)))
 
 (defn create-random-coordinate
   "create a random coordinate"
