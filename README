@@ -13,7 +13,7 @@ open REPL
 Or if u want to play around some more:
 
 To create tanks:
-open the repl; wat is dit?
+open the repl;
 
 (ns ClankAttack.core)
 ;create tanks:
