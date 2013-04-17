@@ -2,7 +2,7 @@
   (:use [ClankAttack.world])
   (:import (java.awt Color Graphics Dimension)))
 
-;should be scale
+;should not be at scale
 (def *tank-radius* (/ 10 2))
 
 ;timing constants
